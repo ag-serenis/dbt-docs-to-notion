@@ -26,6 +26,7 @@ Ideally you should also write descriptions for models and columns as is a [best 
 - `dbt-package`: dbt-bigquery, dbt-postgres, dbt-bigquery==1.0.0, etc. (**required**)
 - `dbt-profile-path`: where profile.yml lives (default: `./`)
 - `dbt-target`: profile target to use for dbt docs generation (**required**)
+- `dbt-project-path`: where dbt_project.yml lives (default: `./`)
 - `model-records-to-write`: "all" or "model_name_1 model_name_2 ..." (default: "all")
 - `notion-database-name`: what to name the Notion database of dbt models (**required**)
 - `notion-parent-id`: Notion page where database of dbt models will be added (**required**)
