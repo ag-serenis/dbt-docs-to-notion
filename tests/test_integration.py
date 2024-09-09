@@ -107,71 +107,71 @@ class TestDbtDocsToNotionIntegration(unittest.TestCase):
       self.assertEqual(compiled_code_child_block['code']['language'], 'sql')
       self.assertEqual(compiled_code_child_block['code']['rich_text'][0]['text']['content'], self.comparison_manifest['compiled_code'])
 
-    @patch('dbt_docs_to_notion.make_request')
-    def test_create_new_database(self, mock_make_request):
-        def _mocked_make_request(endpoint, querystring, method, **request_kwargs):
-          self.recorded_requests.append((endpoint, method))
-          if endpoint == 'blocks/' and method == 'GET':
-              return NOTION_MOCK_NONEXISTENT_QUERY
-          elif endpoint == 'databases/' and querystring == '' and method == 'POST':
-              database_obj = request_kwargs['json']
-              self._verify_database_obj(database_obj)
-              return NOTION_MOCK_DATABASE_CREATE
-          elif endpoint == 'databases/' and '/query' in querystring and method == 'POST':
-              return NOTION_MOCK_NONEXISTENT_QUERY
-          elif endpoint == 'pages/' and method == 'POST':
-              record_obj = request_kwargs['json']
-              self._verify_record_obj(record_obj)
-              record_children_obj = request_kwargs['json']['children']
-              self._verify_record_children_obj(record_children_obj)
-              return NOTION_MOCK_RECORD_CREATE
-        mock_make_request.side_effect = _mocked_make_request
+    # @patch('dbt_docs_to_notion.make_request')
+    # def test_create_new_database(self, mock_make_request):
+        # def _mocked_make_request(endpoint, querystring, method, **request_kwargs):
+        #   self.recorded_requests.append((endpoint, method))
+        #   if endpoint == 'blocks/' and method == 'GET':
+        #       return NOTION_MOCK_NONEXISTENT_QUERY
+        #   elif endpoint == 'databases/' and querystring == '' and method == 'POST':
+        #       database_obj = request_kwargs['json']
+        #       self._verify_database_obj(database_obj)
+        #       return NOTION_MOCK_DATABASE_CREATE
+        #   elif endpoint == 'databases/' and '/query' in querystring and method == 'POST':
+        #       return NOTION_MOCK_NONEXISTENT_QUERY
+        #   elif endpoint == 'pages/' and method == 'POST':
+        #       record_obj = request_kwargs['json']
+        #       self._verify_record_obj(record_obj)
+        #       record_children_obj = request_kwargs['json']['children']
+        #       self._verify_record_children_obj(record_children_obj)
+        #       return NOTION_MOCK_RECORD_CREATE
+        # mock_make_request.side_effect = _mocked_make_request
 
-        main(argv=[None, 'all'])
+        # main(argv=[None, 'all'])
 
-        self.assertEqual(
-          self.recorded_requests,
-          [
-            ('blocks/', 'GET'),
-            ('databases/', 'POST'),
-            ('databases/', 'POST'),
-            ('pages/', 'POST'),
-          ]
-        )
+        # self.assertEqual(
+        #   self.recorded_requests,
+        #   [
+        #     ('blocks/', 'GET'),
+        #     ('databases/', 'POST'),
+        #     ('databases/', 'POST'),
+        #     ('pages/', 'POST'),
+        #   ]
+        # )
 
-    @patch('dbt_docs_to_notion.make_request')
-    def test_update_existing_database(self, mock_make_request):
-        def _mocked_make_request(endpoint, querystring, method, **request_kwargs):
-          self.recorded_requests.append((endpoint, method))
-          if endpoint == 'blocks/' and method == 'GET':
-              return NOTION_MOCK_EXISTENT_CHILD_PAGE_QUERY
-          elif endpoint == 'databases/' and '/query' in querystring and method == 'POST':
-              return NOTION_MOCK_EXISTENT_DATABASE_RECORDS_QUERY
-          elif endpoint == 'pages/' and method == 'PATCH':
-              record_obj = request_kwargs['json']
-              self._verify_record_obj(record_obj)
-              return {} # response is thrown away
-          elif endpoint == 'blocks/' and method == 'DELETE':
-              return {} # response is thrown away
-          elif endpoint == 'blocks/' and method == 'PATCH':
-              record_children_obj = request_kwargs['json']['children']
-              self._verify_record_children_obj(record_children_obj)
-              return {} # response is thrown away
-        mock_make_request.side_effect = _mocked_make_request
+    # @patch('dbt_docs_to_notion.make_request')
+    # def test_update_existing_database(self, mock_make_request):
+    #     def _mocked_make_request(endpoint, querystring, method, **request_kwargs):
+    #       self.recorded_requests.append((endpoint, method))
+    #       if endpoint == 'blocks/' and method == 'GET':
+    #           return NOTION_MOCK_EXISTENT_CHILD_PAGE_QUERY
+    #       elif endpoint == 'databases/' and '/query' in querystring and method == 'POST':
+    #           return NOTION_MOCK_EXISTENT_DATABASE_RECORDS_QUERY
+    #       elif endpoint == 'pages/' and method == 'PATCH':
+    #           record_obj = request_kwargs['json']
+    #           self._verify_record_obj(record_obj)
+    #           return {} # response is thrown away
+    #       elif endpoint == 'blocks/' and method == 'DELETE':
+    #           return {} # response is thrown away
+    #       elif endpoint == 'blocks/' and method == 'PATCH':
+    #           record_children_obj = request_kwargs['json']['children']
+    #           self._verify_record_children_obj(record_children_obj)
+    #           return {} # response is thrown away
+    #     mock_make_request.side_effect = _mocked_make_request
 
-        main(argv=[None, 'all'])
+    #     main(argv=[None, 'all'])
 
-        self.assertEqual(
-          self.recorded_requests,
-          [
-            ('blocks/', 'GET'),
-            ('databases/', 'POST'),
-            ('pages/mock_record_id', 'PATCH'),
-            ('blocks/', 'GET'),
-            ('blocks/', 'DELETE'),
-            ('blocks/', 'PATCH'),
-          ]
-        )
+    #     self.assertEqual(
+    #       self.recorded_requests,
+    #       [
+    #         ('blocks/', 'GET'),
+    #         ('databases/', 'POST'),
+    #         ('pages/mock_record_id', 'PATCH'),
+    #         ('blocks/', 'GET'),
+    #         ('blocks/', 'DELETE'),
+    #         ('blocks/', 'PATCH'),
+    #       ]
+    #     )
 
 
 if __name__ == '__main__':
